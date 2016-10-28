@@ -1,0 +1,19 @@
+{
+  "entrypoint": "index.html",
+  "shell": "src/hack-app.html",
+  "fragments": [
+    "src/hack-view1.html",
+    "src/hack-view2.html",
+    "src/hack-view3.html",
+    "src/hack-view404.html"
+  ],
+  "sourceGlobs": [
+   "src/**/*",
+   "images/**/*",
+   "bower.json"
+  ],
+  "includeDependencies": [
+    "manifest.json",
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js"
+  ]
+}
