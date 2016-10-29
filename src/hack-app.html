@@ -28,7 +28,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
     <style>
       :host {
-        --app-primary-color: #f7df1e;
+        /*--app-primary-color: #f7df1e;*/
+        --app-primary-color: #fff;
         --app-secondary-color: black;
 
         display: block;
@@ -72,10 +73,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
     <firebase-app
-      api-key="AIzaSyD7rBLu6hc8eHXGIkcGD07M-Iu3kXaM7Qc"
-      database-uri="https://das-hackathon.firebaseio.com/"
-      auth-domain="das-hackathon.firebaseapp.com"
-      storage-bucket="das-hackathon.appspot.com">
+      api-key=""
+      database-uri=""
+      auth-domain=""
+      storage-bucket="">
     </firebase-app>
     <firebase-auth id="auth"
     app-name="das-hackathon"
@@ -96,7 +97,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-drawer>
         <app-toolbar>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="home" href="/home">View One</a>
+          <a name="home" href="/home">Landing</a>
           <a name="sponsors" href="/sponsors">Sponsors</a>
           <a name="schedule" href="/schedule">Schedule</a>
         </iron-selector>

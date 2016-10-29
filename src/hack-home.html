@@ -1,17 +1,29 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="hack-home">
   <template>
     <style include="shared-styles">
       :host {
-        display: block;
+        display: flex;
 
         padding: 10px;
+        margin:100px;
+        margin-top:0;
+        flex-wrap:wrap;
       }
     </style>
+    <template is="dom-repeat" items="{{cards}}">
+      <paper-card image="" class$="frontmatter {{item.size}}">
+        <div class="card-content">
+          <div class="circle">{{index}}</div>
+          {{item.title}}
+        </div>
+      </paper-card>
+    </template>
 
-    <div class="card">
+    <div class="card half">
       <div class="circle">1</div>
       <h1>View One</h1>
       <p>Ut labores minimum atomorum pro. Laudem tibique ut has.
@@ -21,7 +33,14 @@
 
   <script>
     Polymer({
-      is: 'hack-home'
+      is: 'hack-home',
+      attached: function() {
+        this.cards = [
+          {title: "error", size: "full"},
+          {size: "half", title: "thing"},
+          {size: "half", title: "card2"}
+        ]
+      }
     });
   </script>
 </dom-module>

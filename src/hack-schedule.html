@@ -9,6 +9,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="hack-schedule-filter.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="hack-schedule">
@@ -20,18 +22,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding: 10px;
       }
     </style>
-
+    <iron-ajax auto
+      url="/api/schedule">
+    </iron-ajax>
     <div class="card">
       <div class="circle">3</div>
       <h1>Schedule</h1>
       <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
       <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
     </div>
+    <hack-schedule-filter></hack-schedule-filter>
+    <vaadin-grid>
+      <table>
+      </table>
+    </vaddin-grid>
   </template>
 
   <script>
     Polymer({
-      is: 'hack-schedule'
+      is: 'hack-schedule',
+      attached: function() {
+
+      }
     });
   </script>
 </dom-module>
