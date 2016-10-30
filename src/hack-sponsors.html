@@ -1,27 +1,74 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="hack-sponsor-card">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <paper-card>
+      <img src="[[data.img]]" on-click="expand"/>
+      <iron-collapse style="width:200px" opened="[[detailsOpened]]">
+        [[data.description]]
+      </iron-collapse>
+    </paper-card>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'hack-sponsor-card',
+      properties: {
+        detailsOpened: {
+          notify: true
+        }
+      },
+      expand: function() {
+        this.dispatchEvent(new CustomEvent('expand-sponsor', {bubbles: true}))
+      }
+    });
+  </script>
+</dom-module>
 
 <dom-module id="hack-sponsors">
   <template>
     <style include="shared-styles">
       :host {
         display: block;
-
+        height:640px;
         padding: 10px;
       }
     </style>
-
-    <div class="card">
-      <div class="circle">2</div>
-      <h1>Sponsors</h1>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.</p>
-      <p>Id nam odio natum malorum, tibique copiosae expetenda mel ea.Detracto suavitate repudiandae no eum. Id adhuc minim soluta nam.Id nam odio natum malorum, tibique copiosae expetenda mel ea.</p>
-    </div>
+    <iron-ajax auto
+      url="/data/example-sponsors.json"
+      handle-as="json"
+      last-response="{{sponsors}}">
+    </iron-ajax>
+    <iron-list items="[[sponsors]]" grid scroll-target="document">
+      <template>
+        <hack-sponsor-card data="[[item]]" on-expand-sponsor="expandSponsor">
+        </hack-sponsor-card>
+      </template>
+    </iron-list>
   </template>
 
   <script>
     Polymer({
-      is: 'hack-sponsors'
+      is: 'hack-sponsors',
+      properties: {
+
+      },
+      expandSponsor: function(e) {
+        this.querySelectorAll('hack-sponsor-card').forEach((card) => { card.detailsOpened = false; });
+        e.target.detailsOpened = true;
+      },
+      attached: function() {
+        setTimeout(function() { this.$$('iron-list').fire('iron-resize')}.bind(this), 2000)
+      }
     });
   </script>
 </dom-module>

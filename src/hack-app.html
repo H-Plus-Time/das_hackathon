@@ -19,19 +19,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
-<link rel="import" href="hack-icons.html">
+<!-- <link rel="import" href="hack-icons.html"> -->
+<link rel="import" href="shared-styles.html" />
 
 <dom-module id="hack-app">
   <template>
-    <style>
+    <style include="shared-styles">
       :host {
-        /*--app-primary-color: #f7df1e;*/
-        --app-primary-color: #fff;
-        --app-secondary-color: black;
-
         display: block;
       }
 
@@ -41,6 +40,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       app-header paper-icon-button {
         --paper-icon-button-ink-color: white;
+      }
+
+      .profile-img {
+        width:32px;
+        height:32px;
+        border-radius:50%;
       }
 
       .drawer-list {
@@ -66,12 +71,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
-    <app-location route="{{route}}"></app-location>
+    <app-location route="{{route}}"
+      tail="{{subroute}}"
+      use-hash-as-path></app-location>
     <app-route
         route="{{route}}"
         pattern="/:page"
         data="{{routeData}}"
         tail="{{subroute}}"></app-route>
+    <iron-media-query query="max-width: 767px" query-matches="{{app.smallScreen}}"></iron-media-query>
     <firebase-app
       api-key=""
       database-uri=""
@@ -80,14 +88,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </firebase-app>
     <firebase-auth id="auth"
     app-name="das-hackathon"
-    user="{{user}}" provider="google">
+    user="{{app.user}}" provider="google">
     </firebase-auth>
     <firebase-query
       path="/posts/{{channelName}}"
       data="{{_liveData}}">
     </firebase-query>
     <app-indexeddb-mirror
-      session="[[user.uid]]"
+      session="[[app.user.uid]]"
       key="/posts/{{channelName}}"
       data="[[_liveData]]"
       persisted-data="{{posts}}">
@@ -97,9 +105,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-drawer>
         <app-toolbar>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="home" href="/home">Landing</a>
-          <a name="sponsors" href="/sponsors">Sponsors</a>
-          <a name="schedule" href="/schedule">Schedule</a>
+          <template is="dom-repeat" items="[[menuItems]]">
+            <a name="[[item.label]]" href="/#/[[item.label]]">[[item.name]]</a>
+          </template>
         </iron-selector>
       </app-drawer>
 
@@ -110,6 +118,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <app-toolbar>
             <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
             <div main-title>Das Hackathon</div>
+            <paper-tabs>
+                <template is="dom-repeat" items="[[menuItems]]">
+                  <paper-tab name="[[item.label]]" link>
+                    <a href="/#/[[item.label]]">[[item.name]]</a>
+                  </paper-tab>
+                </template>
+            </paper-tabs>
+            <template is="dom-if" if="[[app.user.uid]]">
+              <img class="profile-img" />
+              <paper-icon-button icon="more-vert"></paper-icon-button>
+            </template>
           </app-toolbar>
         </app-header>
 
@@ -118,9 +137,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             attr-for-selected="name"
             fallback-selection="view404"
             role="main">
-          <hack-home name="home"></hack-home>
-          <hack-sponsors name="sponsors"></hack-sponsors>
-          <hack-schedule name="schedule"></hack-schedule>
+          <hack-home name="home" app="[[app]]"></hack-home>
+          <hack-sponsors name="sponsors" app="[[app]]"></hack-sponsors>
+          <hack-projects name="projects" app="[[app]]"></hack-projects>
+          <hack-schedule name="schedule" route="{{subroute}}" app="[[app]]"></hack-schedule>
           <hack-view404 name="view404"></hack-view404>
         </iron-pages>
       </app-header-layout>
@@ -136,6 +156,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: String,
           reflectToAttribute: true,
           observer: '_pageChanged'
+        },
+        app: {
+          type: Object,
+          notify: true,
+          value: function() {
+            return {}
+          }
+        },
+        menuItems: {
+          value: function() {
+            return [
+              {label: "sponsors", name: "Sponsors"},
+              {label: "schedule", name: "Schedule"},
+              {label: "projects", name: "Projects"}
+            ]
+          }
         }
       },
 

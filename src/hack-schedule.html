@@ -10,39 +10,220 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="hack-schedule-filter.html">
-<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="hack-schedule-row.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="shared-styles.html">
+<link rel="import" href="hack-schedule-filter.html" />
 
 <dom-module id="hack-schedule">
   <template>
-    <style include="shared-styles">
+    <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
 
         padding: 10px;
       }
+      nav {
+        background:var(--app-accent-color);
+        border-radius:3px;
+      }
     </style>
     <iron-ajax auto
       url="/api/schedule">
     </iron-ajax>
-    <div class="card">
-      <div class="circle">3</div>
-      <h1>Schedule</h1>
-      <p>Modus commodo minimum eum te, vero utinam assueverit per eu.</p>
-      <p>Ea duis bonorum nec, falli paulo aliquid ei eum.Has at minim mucius aliquam, est id tempor laoreet.Pro saepe pertinax ei, ad pri animal labores suscipiantur.</p>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"
+    ></app-route>
+    <nav class="horizontal layout justified subnav">
+      <template is="dom-if" if="[[!app.smallScreen]]">
+        <paper-tabs selected="{{page}}" attr-for-selected="name">
+          <paper-tab link name="agenda">
+            <a href="#/schedule/agenda">Agenda</a>
+          </paper-tab>
+          <template is="dom-repeat" items="[[schedule.days]]">
+            <paper-tab link name="[[item.label]]">
+              <a href="[[item.href]]">[[item.name]]</a>
+            </paper-tab>
+          </template>
+          <paper-tab link name="my-schedule">
+            <a href="#/schedule/my-schedule">My Schedule</a>
+          </paper-tab>
+        </paper-tabs>
+        <div>
+          Filter <paper-icon-button icon="filter-list" on-tap="toggleFilterPanel"></paper-icon-button>
+        </div>
+
+      </template>
+      <template is="dom-if" if="[[_showDayDropdown(app.smallScreen, page)]]">
+        <paper-dropdown-menu horizontal-align="left"
+                        no-label-float noink>
+         <paper-listbox class="dropdown-content"
+           attr-for-selected="label"
+           selected="[[selectedSubpage]]">
+           <paper-item label="agenda">
+             <a href="#/schedule/agenda">Agenda</a>
+           </paper-item>
+           <template is="dom-repeat" items="[[schedule.days]]">
+             <paper-item label="[[item.label]]">
+               <a href="[[item.href]]">[[item.name]]</a>
+             </paper-item>
+           </template>
+         </paper-listbox>
+       </paper-dropdown-menu>
+       <div>
+         <paper-icon-button icon="social:person"></paper-icon-button>
+         <paper-icon-button icon="filter-list" on-tap="toggleFilterPanel"></paper-icon-button>
+       </div>
+      </template>
+      <template is="dom-if" if="[[_showMyScheduleEx(app.smallScreen, page)]]">
+        <div>
+          <paper-icon-button icon="arrow-back"></paper-icon-button>
+          My Schedule
+        </div>
+        <div>
+          <paper-icon-button icon="filter-list" disabled></paper-icon-button>
+        </div>
+      </template>
+    </nav>
+
+    <div style="position:relative">
+      <hack-schedule-filter filters="{{filters}}" sites="[[sites]]"></hack-schedule-filter>
+      <iron-pages
+        selected="[[page]]"
+        attr-for-selected="name"
+        fallback-selection="agenda">
+        <div name="agenda" style="height:400px">
+          <paper-card class="highlight full buffered-card" heading="test">
+            <div class="card-content" style="max-width:800px">
+              [[schedule.agendaSpiel]]
+            </div>
+          </paper-card>
+          <!-- timeline vis -->
+        </div>
+        <template is="dom-repeat" items="[[schedule.days]]">
+          <div name="[[item.label]]">
+            [[item.label]]
+            <!-- <template is="dom-repeat" items="{{schedule.days}}">
+              <hack-schedule-row></hack-schedule-row>
+            </template> -->
+          </div>
+        </template>
+        <div name="my-schedule">
+          <template is="dom-if" if="[[_showMyScheduleExplan(app.user.id, scheduleExplanDismissed)]]">
+            <paper-card class="full highlight buffered-card" heading="test">
+              <paper-icon-button icon="close" on-click="dismissScheduleExplan"></paper-icon-button>
+              If you have notifications enabled, you'll be notified on this device when:
+              <ul>
+                <li>
+                  Events in My Schedule are about to start
+                </li>
+                <li>
+                  Videos of sessions added to My Schedule are available
+                </li>
+              </ul>
+              <p>
+                Note: Notifications are activated per device. To receive notifications on multiple devices, sign in on each device, enable notifications, and make sure you're online. All device notifications can be turned on/off at any time in the settings panel.
+              </p>
+              <paper-button style="background:white;" raised>Settings</paper-button>
+            </paper-card>
+          </template>
+          <template is="dom-if" if="[[!app.user.uid]]">
+            <paper-card class="full highlight buffered-card">
+              <h2>Create your custom schedule</h2>
+              <p>
+                Sign in to add events to My Schedule. To receive notifications on this device, you need to sign in and enable notifications.
+                <br />
+                Note: Notifications are activated per device. To receive notifications on multiple devices, sign in on each device, enable notifications, and make sure you're online. All device notifications can be turned on/off at any time in the settings panel.
+              </p>
+
+              <paper-button style="background:white;" raised>Sign in</paper-button>
+            </paper-card>
+          </template>
+        </div>
+      </iron-pages>
     </div>
-    <hack-schedule-filter></hack-schedule-filter>
-    <vaadin-grid>
-      <table>
-      </table>
-    </vaddin-grid>
+
+
+
   </template>
 
   <script>
     Polymer({
       is: 'hack-schedule',
+      properties: {
+        page: {
+          notify:true
+        },
+        scheduleExplanDismissed: {
+          type: Boolean,
+          value: function() { return false; }
+        },
+        sites: {
+          value: function() {
+            return [
+              {name: "Foo"},
+              {name: "Bar"}
+            ]
+          }
+        },
+        schedule: {
+          type: Object,
+          value: function() {
+            return {
+              days: [
+                {href: "#/schedule/day1", name: "October 14", label: 'day1'},
+                {href: "#/schedule/day2", name: "October 15", label: 'day2'},
+                {href: "#/schedule/day3", name: "October 16", label: 'day3'}
+              ],
+              agendaSpiel: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+            }
+          }
+        }
+      },
       attached: function() {
-
+        // this.set('route.page', 'agenda')
+      },
+      _showMyScheduleEx: function(smallScreen, subPage) {
+        if(smallScreen && subPage == "my-schedule") {
+          console.log(subPage);
+          console.log("Allo");
+          return true;
+        }
+      },
+      _showDayDropdown: function(smallScreen, subPage) {
+        if(smallScreen && subPage != "my-schedule") {
+          return true;
+        }
+      },
+      _showMyScheduleExplan: function(uid, scheduleExplanDismissed) {
+        if(!scheduleExplanDismissed) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      dismissScheduleExplan: function() {
+        this.scheduleExplanDismissed = true;
+      },
+      toggleFilterPanel: function(e) {
+        console.log(e);
+        console.log(this.$$('hack-schedule-filter'))
+        // TODO: set source paper-icon-button's icon to close/filter-list
+        this.$$('hack-schedule-filter').opened = !this.$$('hack-schedule-filter').opened;
       }
     });
   </script>

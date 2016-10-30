@@ -1,0 +1,38 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="shared-styles.html" />
+<dom-module id="hack-schedule-filter">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        position:absolute;
+        z-index:100;
+        width:100%;
+      }
+    </style>
+    <iron-collapse opened="[[opened]]">
+      <paper-card class="full">
+        <div class="sites">
+          <template is="dom-repeat" items="[[sites]]">
+            <paper-checkbox>[[item.name]]</paper-checkbox>
+          </template>
+        </div>
+      </paper-card>
+    </iron-collapse>
+  </template>
+  <script>
+    Polymer({
+      is: 'hack-schedule-filter',
+      properties: {
+        opened: {
+          type: Boolean,
+          value: function () { return false; },
+          notify: true
+        }
+      }
+    });
+  </script>
+</dom-module>
