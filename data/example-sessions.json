@@ -1,0 +1,5 @@
+[
+  {"timestamp": 1400000000, "duration": 60, "title": "foo", "location": "lorem ipsum"},
+  {"timestamp": 1400000000, "duration": 90, "title": "bar", "location": "lorem ipsum"},
+  {"timestamp": 1400005000, "duration": 60, "title": "baz", "location": "lorem ipsum"}
+]

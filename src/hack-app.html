@@ -18,6 +18,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-icons/social-icons.html">
@@ -118,13 +119,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <app-toolbar>
             <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
             <div main-title>Das Hackathon</div>
-            <paper-tabs>
-                <template is="dom-repeat" items="[[menuItems]]">
-                  <paper-tab name="[[item.label]]" link>
-                    <a href="/#/[[item.label]]">[[item.name]]</a>
-                  </paper-tab>
-                </template>
-            </paper-tabs>
+            <template is="dom-if" if="[[!app.smallScreen]]">
+              <paper-tabs>
+                  <template is="dom-repeat" items="[[menuItems]]">
+                    <paper-tab name="[[item.label]]" link>
+                      <a href="/#/[[item.label]]">[[item.name]]</a>
+                    </paper-tab>
+                  </template>
+              </paper-tabs>
+            </template>
             <template is="dom-if" if="[[app.user.uid]]">
               <img class="profile-img" />
               <paper-icon-button icon="more-vert"></paper-icon-button>
@@ -140,7 +143,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <hack-home name="home" app="[[app]]"></hack-home>
           <hack-sponsors name="sponsors" app="[[app]]"></hack-sponsors>
           <hack-projects name="projects" app="[[app]]"></hack-projects>
-          <hack-schedule name="schedule" route="{{subroute}}" app="[[app]]"></hack-schedule>
+          <hack-schedule name="schedule"
+            route="{{subroute}}"
+            on-hack-navigate="navigate"
+            app="[[app]]">
+          </hack-schedule>
           <hack-view404 name="view404"></hack-view404>
         </iron-pages>
       </app-header-layout>
@@ -187,6 +194,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // Load page import on demand. Show 404 page if fails
         var resolvedPageUrl = this.resolveUrl('hack-' + page + '.html');
         this.importHref(resolvedPageUrl, null, this._showPage404, true);
+      },
+      navigate: function(e) {
+        console.log(e);
+        console.log(this.subroute);
+        this.subroute.page = e.detail;
       },
 
       _showPage404: function() {

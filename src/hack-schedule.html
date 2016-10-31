@@ -1,13 +1,3 @@
-<!--
-@license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="hack-schedule-filter.html">
 <link rel="import" href="hack-schedule-row.html">
@@ -18,14 +8,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/iron-icons/social-icons.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="hack-schedule-filter.html" />
-
+<link rel="import" href="hack-schedule-row.html" />
+<link rel="import" href="hack-session-dialog.html" />
+<script src="../bower_components/underscore/underscore-min.js"></script>
 <dom-module id="hack-schedule">
   <template>
     <style include="shared-styles iron-flex iron-flex-alignment">
@@ -34,13 +28,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         padding: 10px;
       }
-      nav {
-        background:var(--app-accent-color);
-        border-radius:3px;
+      paper-dropdown-menu {
+        padding-left:10px;
       }
     </style>
     <iron-ajax auto
       url="/api/schedule">
+    </iron-ajax>
+    <iron-ajax auto
+      url="/data/example-schedule.json"
+      handle-as="json"
+      last-response="{{schedule}}">
     </iron-ajax>
     <app-route
         route="{{route}}"
@@ -48,6 +46,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         data="{{routeData}}"
         tail="{{subroute}}"
     ></app-route>
+    <hack-session-dialog>
+    </hack-session-dialog>
     <nav class="horizontal layout justified subnav">
       <template is="dom-if" if="[[!app.smallScreen]]">
         <paper-tabs selected="{{page}}" attr-for-selected="name">
@@ -72,26 +72,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-dropdown-menu horizontal-align="left"
                         no-label-float noink>
          <paper-listbox class="dropdown-content"
-           attr-for-selected="label"
-           selected="[[selectedSubpage]]">
-           <paper-item label="agenda">
+           attr-for-selected="mach-label"
+           fallback-selection="agenda"
+           selected="[[page]]"
+           on-iron-select="dropdownNavigate">
+           <paper-item mach-label="agenda" label="Agenda">
              <a href="#/schedule/agenda">Agenda</a>
            </paper-item>
            <template is="dom-repeat" items="[[schedule.days]]">
-             <paper-item label="[[item.label]]">
+             <paper-item mach-label="[[item.label]]" label="[[item.name]]">
                <a href="[[item.href]]">[[item.name]]</a>
              </paper-item>
            </template>
          </paper-listbox>
        </paper-dropdown-menu>
        <div>
-         <paper-icon-button icon="social:person"></paper-icon-button>
+         <paper-icon-button icon="social:person" on-tap="toggleMySchedule"></paper-icon-button>
          <paper-icon-button icon="filter-list" on-tap="toggleFilterPanel"></paper-icon-button>
        </div>
       </template>
       <template is="dom-if" if="[[_showMyScheduleEx(app.smallScreen, page)]]">
         <div>
-          <paper-icon-button icon="arrow-back"></paper-icon-button>
+          <paper-icon-button icon="arrow-back" on-tap="toggleMySchedule"></paper-icon-button>
           My Schedule
         </div>
         <div>
@@ -107,7 +109,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         attr-for-selected="name"
         fallback-selection="agenda">
         <div name="agenda" style="height:400px">
-          <paper-card class="highlight full buffered-card" heading="test">
+          <paper-card class="highlight full buffered-card">
             <div class="card-content" style="max-width:800px">
               [[schedule.agendaSpiel]]
             </div>
@@ -116,10 +118,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
         <template is="dom-repeat" items="[[schedule.days]]">
           <div name="[[item.label]]">
-            [[item.label]]
-            <!-- <template is="dom-repeat" items="{{schedule.days}}">
-              <hack-schedule-row></hack-schedule-row>
-            </template> -->
+            <iron-list items="[[_calculateFirstOfBlock(item.sessions)]]">
+              <template>
+                <hack-schedule-row data="[[item]]"></hack-schedule-row>
+              </template>
+            </iron-list>
           </div>
         </template>
         <div name="my-schedule">
@@ -156,9 +159,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </iron-pages>
     </div>
-
-
-
   </template>
 
   <script>
@@ -166,7 +166,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       is: 'hack-schedule',
       properties: {
         page: {
-          notify:true
+          notify:true,
         },
         scheduleExplanDismissed: {
           type: Boolean,
@@ -181,32 +181,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           }
         },
         schedule: {
-          type: Object,
-          value: function() {
-            return {
-              days: [
-                {href: "#/schedule/day1", name: "October 14", label: 'day1'},
-                {href: "#/schedule/day2", name: "October 15", label: 'day2'},
-                {href: "#/schedule/day3", name: "October 16", label: 'day3'}
-              ],
-              agendaSpiel: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-            }
-          }
+          type: Object
         }
       },
+      listeners: {
+        'open-schedule-modal': 'openScheduleModal'
+      },
+
+      openScheduleModal: function(e) {
+        this.$$('hack-session-dialog').data = e.detail;
+        this.$$('hack-session-dialog').opened = !this.$$('hack-session-dialog').opened;
+      },
       attached: function() {
-        // this.set('route.page', 'agenda')
+        this.set('page', 'agenda');
+      },
+      dropdownNavigate: function(e) {
+        this.dispatchEvent(new CustomEvent('hack-navigate', {detail: e.detail.item.getAttribute('mach-label'), bubbles: true}))
+      },
+      toggleMySchedule: function() {
+        if(this.page != 'my-schedule') {
+          this.set('oldPage', this.page);
+          this.set('page', 'my-schedule')
+        } else {
+          this.set('page', this.oldPage)
+          this.set('oldPage', "");
+        }
       },
       _showMyScheduleEx: function(smallScreen, subPage) {
         if(smallScreen && subPage == "my-schedule") {
-          console.log(subPage);
-          console.log("Allo");
           return true;
         }
       },
       _showDayDropdown: function(smallScreen, subPage) {
-        if(smallScreen && subPage != "my-schedule") {
+        if(smallScreen && this.page != "my-schedule") {
           return true;
+        } else {
+          return false;
         }
       },
       _showMyScheduleExplan: function(uid, scheduleExplanDismissed) {
@@ -218,6 +228,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
       dismissScheduleExplan: function() {
         this.scheduleExplanDismissed = true;
+      },
+      _calculateFirstOfBlock: function(sessions) {
+        var unique_timestamps = []
+        return _(sessions).chain().sortBy((session) => session.title)
+        .sortBy((session) => session.timestamp)
+        .omit('firstOfBlock')
+        .map((session) => {
+          if(!unique_timestamps.includes(session.timestamp)) {
+            unique_timestamps.push(session.timestamp);
+            session.firstOfBlock = true;
+          } else {
+          }
+          return session;
+        })
+        .value()
       },
       toggleFilterPanel: function(e) {
         console.log(e);

@@ -15,7 +15,11 @@
     </style>
     <iron-collapse opened="[[opened]]">
       <paper-card class="full">
+        <div class="themes">
+
+        </div>
         <div class="sites">
+          Sites
           <template is="dom-repeat" items="[[sites]]">
             <paper-checkbox>[[item.name]]</paper-checkbox>
           </template>

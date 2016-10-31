@@ -1,18 +1,107 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<script src="../bower_components/moment/min/moment.min.js"></script>
+<script src="../bower_components/humanize-duration/humanize-duration.js"></script>
 <dom-module id="hack-schedule-row">
   <template>
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       :host {
-        display: block;
+        @apply(--layout-horizontal);
+      }
+      .time-col {
+        padding:20px;
+        width:5%;
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+        align-items:center;
+      }
+      .event-container {
+        margin:20px;
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+        @apply(--layout-flex);
+        align-items:center;
+      }
+      .event-col {
+        @apply(--layout-vertical);
+        flex:1;
+        cursor:pointer;
+      }
+      paper-icon-button[aria-pressed="true"] {
+        color:red;
+      }
+      paper-icon-button[aria-pressed="false"] {
+        color:var(--app-accent-color);
+      }
+      .event-details {
+        color:var(--app-tertiary-color);
       }
     </style>
+    <div class="time-col">
+      <h2>[[_calculateTimeDisplay(data)]]</h2>
+    </div>
+    <div class="event-container">
+      <div class="event-col" on-tap="openSessionModal">
+        <h2>[[data.title]]</h2>
+        <div class="event-details">
+          [[durationToString(data.duration)]] / [[data.location]]
+        </div>
+      </div>
+      <paper-icon-button toggles icon="[[_calculateIcon(favourite)]]"
+        on-tap="toggleFavourite">
+      </paper-icon-button>
+    </div>
 
   </template>
   <script>
     Polymer({
       is: 'hack-schedule-row',
+      properties: {
+        data: {
+          type: Object,
+          value: function() {
+            return {title: "lorem ipsum", duration: 90, location: "bar", time: "12:00"}
+          }
+        },
+        favourite: {
+          type: Boolean,
+          value: function () { return false; }
+        }
+      },
+      attached: function() {
 
+      },
+      toggleFavourite: function() {
+        this.set('favourite', !this.favourite);
+      },
+      _calculateTimeDisplay: function(session) {
+        if(session.firstOfBlock) {
+          return this._timestampToString(session.timestamp)
+        }
+      },
+      openSessionModal: function(e) {
+        this.dispatchEvent(new CustomEvent('open-schedule-modal', {detail: this.data, bubbles: true}))
+      },
+      _timestampToString: function(timestamp) {
+        console.log(timestamp);
+        return moment.unix(timestamp).format("hA");
+      },
+      durationToString: function(minutes) {
+        var retainValue = function (value) {
+            return value;
+        };
+        moment.relativeTimeRounding(retainValue);
+        return humanizeDuration(moment.duration(minutes, 'minutes').asMilliseconds());
+      },
+      _calculateIcon: function(favourite) {
+        if(this.favourite) {
+          return 'remove-circle-outline';
+        } else {
+          return 'add-circle-outline';
+        }
+      }
     });
   </script>
 </dom-module>

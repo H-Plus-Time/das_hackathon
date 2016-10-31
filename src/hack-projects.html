@@ -1,17 +1,80 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html" />
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
-<dom-module id="hack-project-card">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+
+<dom-module id="hack-project-filter">
   <template>
     <style>
+      :host {
+        display: block;
+      }
+      paper-card {
+        position:absolute;
+        z-index:100;
+        min-height:150px;
+        width:100%;
+      }
+      .filters {
+        display:flex;
+        flex-wrap:wrap;
+        justify-content:space-between;
+        padding:10px;
+      }
+      .sites {
+        display:flex;
+        flex-direction:column;
+        justify-content:space-between;
+        padding-right:16px;
+      }
+    </style>
+    <iron-ajax auto
+      url="/data/example-sites.json"
+      handle-as="json"
+      last-response="{{sites}}">
+    </iron-ajax>
+    <iron-collapse opened="[[opened]]">
+      <paper-card class="full">
+        <div class="card-content filters">
+          <div class="themes">
+            Theme
+          </div>
+          <div class="sites">
+            Site
+            <template is="dom-repeat" items="[[sites]]">
+              <paper-checkbox>[[item.name]]</paper-checkbox>
+            </template>
+          </div>
+        </div>
+      </paper-card>
+    </iron-collapse>
+  </template>
+  <script>
+    Polymer({
+      is: 'hack-project-filter',
+
+    });
+  </script>
+</dom-module>
+
+<dom-module id="hack-project-card">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
       :host {
         display:block;
       }
       paper-card {
-        display: flex;
+        display:flex;
         flex-direction:row;
+        flex-wrap:wrap;
+      }
+      div {
+        max-width:50%;
       }
       img {
         padding-right:10px;
@@ -48,20 +111,26 @@
         @apply(--layout-justified);
         align-items:flex-end;
       }
+      .project-container {
+        position:relative;
+      }
     </style>
     <div class="filter-group">
       <paper-input label="search"></paper-input>
       <div>
         Filter
-        <paper-icon-button icon="filter-list"></paper-icon-button>
+        <paper-icon-button toggles icon="filter-list" active="{{opened}}"></paper-icon-button>
       </div>
     </div>
-    <iron-list items="[[projects]]" scroll-target="document">
-      <template>
-        <hack-project-card data="[[item]]">
-        </hack-project-card>
-      </template>
-    </iron-list>
+    <div class="project-container">
+      <hack-project-filter opened="{{opened}}"></hack-project-filter>
+      <iron-list items="[[projects]]" scroll-target="document">
+        <template>
+          <hack-project-card data="[[item]]">
+          </hack-project-card>
+        </template>
+      </iron-list>
+    </div>
   </template>
   <script>
     Polymer({

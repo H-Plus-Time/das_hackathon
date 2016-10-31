@@ -20,6 +20,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         --app-accent-color:#4c7ce3;
         --app-secondary-accent-color:#789cea;
         --app-secondary-color: black;
+        --app-tertiary-color: rgb(88, 88, 88)
+      }
+      paper-dropdown-menu {
+        max-width:150px;
+        --paper-input-container-color: inherit;
+        --paper-dropdown-menu-icon: {
+          color: inherit;
+        };
+        --paper-input-container-underline: {
+          display:none;
+        }
+        --paper-input-container-underline-focus: {
+          display: none;
+        };
+      }
+      paper-dropdown-menu a {
+        text-decoration:none;
+        color:inherit;
       }
       .card {
         padding: 16px;
@@ -33,9 +51,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       nav.subnav {
         height:69px;
-      }
-      nav.subnav * {
-        height:100%;
+        @apply(--layout-horizontal);
+        justify-content:space-between;
+        @apply(--layout-relative);
+        align-items:center;
+        background:var(--app-accent-color);
+        border-radius:3px;
       }
       paper-card.buffered-card {
         padding:30px;
@@ -47,9 +68,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin-left:48px;
       }
       paper-tab[link] {
-        padding:0;
+        /*padding:0;*/
       }
-      paper-tab[link] > a {
+      paper-tab[link] a {
         color: var(--app-secondary-color);
         text-transform:uppercase;
         @apply(--layout-horizontal);

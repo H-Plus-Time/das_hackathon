@@ -29,7 +29,14 @@
     "bin-packing-grid": "^0.2.3",
     "iron-ajax": "^1.4.3",
     "iron-collapse": "^1.2.1",
-    "paper-checkbox": "^1.4.1"
+    "paper-checkbox": "^1.4.1",
+    "moment": "momentjs#^2.15.2",
+    "underscore": "^1.8.3",
+    "humanize-duration": "^3.9.1",
+    "paper-dialog": "^1.1.0",
+    "paper-dialog-scrollable": "^1.1.5",
+    "paper-fab": "^1.2.1",
+    "iron-image": "^1.2.5"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

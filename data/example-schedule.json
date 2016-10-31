@@ -1,0 +1,65 @@
+{
+    "agendaSpiel": "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    "days": [{
+        "href": "#/schedule/day1",
+        "name": "October 14",
+        "label": "day1",
+        "sessions": [{
+            "timestamp": 1400000000,
+            "duration": 60,
+            "title": "foo",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+            "location": "lorem ipsum"
+        }, {
+            "timestamp": 1400000000,
+            "duration": 90,
+            "title": "bar",
+            "location": "lorem ipsum"
+        }, {
+            "timestamp": 1400065000,
+            "duration": 120,
+            "title": "baz",
+            "location": "lorem ipsum"
+        }]
+    }, {
+        "href": "#/schedule/day2",
+        "name": "October 15",
+        "label": "day2",
+        "sessions": [{
+            "timestamp": 1400000000,
+            "duration": 60,
+            "title": "foo",
+            "location": "lorem ipsum"
+        }, {
+            "timestamp": 1400000000,
+            "duration": 90,
+            "title": "bar",
+            "location": "lorem ipsum"
+        }, {
+            "timestamp": 1400005000,
+            "duration": 60,
+            "title": "baz",
+            "location": "lorem ipsum"
+        }]
+    }, {
+        "href": "#/schedule/day3",
+        "name": "October 16",
+        "label": "day3",
+        "sessions": [{
+            "timestamp": 1400000000,
+            "duration": 60,
+            "title": "foo",
+            "location": "lorem ipsum"
+        }, {
+            "timestamp": 1400000000,
+            "duration": 90,
+            "title": "bar",
+            "location": "lorem ipsum"
+        }, {
+            "timestamp": 1400005000,
+            "duration": 60,
+            "title": "baz",
+            "location": "lorem ipsum"
+        }]
+    }]
+}
