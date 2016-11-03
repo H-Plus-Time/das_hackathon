@@ -13,6 +13,9 @@
         margin-top:0;
         flex-wrap:wrap;
       }
+      paper-card:hover {
+        @apply(--shadow-elevation-8dp)
+      }
     </style>
     <template is="dom-repeat" items="{{cards}}">
       <paper-card image="" class$="frontmatter {{item.size}}">
@@ -22,13 +25,6 @@
         </div>
       </paper-card>
     </template>
-
-    <div class="card half">
-      <div class="circle">1</div>
-      <h1>View One</h1>
-      <p>Ut labores minimum atomorum pro. Laudem tibique ut has.
-      <p>Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Cu mei vide viris gloriatur, at populo eripuit sit.</p>
-    </div>
   </template>
 
   <script>

@@ -9,11 +9,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <!-- shared styles for all views -->
 <dom-module id="shared-styles">
   <template>
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       :root {
         /*--app-primary-color: #f7df1e;*/
         --app-primary-color: #08b3a6;
@@ -60,6 +60,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       paper-card.buffered-card {
         padding:30px;
+      }
+      paper-card:hover {
+        @apply(--shadow-elevation-4dp);
       }
       .highlight {
         background: var(--app-secondary-accent-color);
