@@ -1,20 +1,36 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">
 <link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../bower_components/google-youtube/google-youtube.html" />
 <dom-module id="hack-session-dialog">
   <template>
     <style>
       :host {
         display: flex;
       }
+
       paper-dialog {
-        max-width:50%;
+        width:100%;
+      }
+      @media(min-width: 768px) {
+        paper-dialog {
+          width:50%;
+          margin-top:0 !important;
+        }
       }
       paper-dialog-scrollable {
-        /*padding:0;*/
+        position:relative;
+        top:-24px;
+        --paper-dialog-scrollable: {
+          max-height: 80vh;
+          padding:0;
+        }
       }
       paper-fab {
         position:absolute;
@@ -22,20 +38,61 @@
         bottom:calc(-56px/2);
         background:#fff;
         color:var(--app-secondary-color);
+        z-index:1;
       }
       .dialog-banner {
         position:relative;
+        width:100%;
+        height:430px;
+      }
+      .dialog-banner > iron-image {
+        width:100%;
+        position:absolute;
+        top:0;
+        bottom:0;
+        right:0;
+        left:0;
+      }
+      google-youtube {
+        position:absolute;
+        top:0;
+        right:0;
+        left:0;
+        bottom:0;
+        display:none;
+      }
+      google-youtube[active] {
+        display:inherit;
+      }
+      .dialog-content {
+        padding:20px;
+      }
+      .overlay-close {
+        position:absolute;
+        top:0;
+        left:0;
+        margin:10px;
+        z-index:10;
       }
 
     </style>
-    <paper-dialog opened="[[opened]]">
+    <paper-dialog opened="[[opened]]" entry-animation="scale-up-animation"
+              exit-animation="fade-out-animation">
       <paper-dialog-scrollable>
         <div>
           <div class="dialog-banner">
-            <iron-image src="http://placehold.it/350x150"></iron-image>
+            <paper-icon-button class="overlay-close" icon="close"></paper-icon-button>
+            <iron-image src="http://placehold.it/350x150" fit sizing="cover" on-click="_dispVideo"></iron-image>
+            <google-youtube fit
+              video-id="ENIIevCgel4"
+              height="100%"
+              width="100%"
+              rel="0"
+              start="5">
+            </google-youtube>
             <paper-fab raised icon="add"></paper-fab>
           </div>
-          <div>
+          <div class="dialog-content">
             <h2>[[data.title]]</h2>
             <p>
               [[_computeSessionTimeString(data)]] / [[data.location]]
@@ -51,6 +108,9 @@
   <script>
     Polymer({
       is: 'hack-session-dialog',
+      _dispVideo: function() {
+        this.$$('google-youtube').setAttribute('active', true)
+      },
       _computeSessionTimeString: function(data) {
         return `${moment.unix(1400000000).format("MMMM DD, hh:mmA")} - \
         ${moment.unix(data.timestamp).add(moment.duration(data.duration, 'minutes')).format("h:mmA")}`

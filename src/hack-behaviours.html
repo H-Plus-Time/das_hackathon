@@ -1,4 +1,33 @@
+<script src="../bower_components/chance/dist/chance.min.js"></script>
 <script>
-  HPWA = document.HPWA || {
+  HPWA = document.HPWA || {}
+  HPWA = {
+    generate: {
+      projects: (num_projects) => {
+        options = [
+          "bioinformatics",
+          "regional accessibility",
+          "mental health",
+          "aged care",
+          "clinical trials"
+        ];
+        sites = [
+          "Sydney",
+          "San Fransisco",
+          "Barcelona"
+        ]
+        return [...Array(num_projects).keys()].map(() => {
+          themes = chance.pickset(
+            options, chance.natural({min: 1, max: options.length-1}))
+          return {
+            title: chance.sentence(),
+            themes: themes,
+            site: chance.pickone(sites),
+            description: `<p>${chance.paragraph()}</p>`,
+            img: "http://lorempixel.com/200/200/"
+          }
+        })
+      }
+    }
   }
 </script>

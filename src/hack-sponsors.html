@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 
@@ -8,27 +9,27 @@
   <template>
     <style>
       :host {
-        display: block;
+        @apply(--layout-vertical);
+        padding:30px;
+        width:300px;
+      }
+      .sponsor-description {
+        /*background:white;*/
       }
     </style>
-    <paper-card>
-      <img src="[[data.img]]" on-click="expand"/>
-      <iron-collapse style="width:200px" opened="[[detailsOpened]]">
-        [[data.description]]
-      </iron-collapse>
-    </paper-card>
-
+    <img src="[[data.img]]" on-click="expand"/>
+    <div class="sponsor-description" hidden$="[[!longform]]">
+      [[data.description]]
+    </div>
   </template>
   <script>
     Polymer({
       is: 'hack-sponsor-card',
       properties: {
-        detailsOpened: {
-          notify: true
+        longform: {
+          type: Boolean,
+          value: function() { return false}
         }
-      },
-      expand: function() {
-        this.dispatchEvent(new CustomEvent('expand-sponsor', {bubbles: true}))
       }
     });
   </script>
@@ -39,8 +40,14 @@
     <style include="shared-styles">
       :host {
         display: block;
-        height:640px;
         padding: 10px;
+        margin:auto;
+        /*background:white;*/
+      }
+      @media(min-width:1280px) {
+        :host {
+          max-width:75%;
+        }
       }
     </style>
     <iron-ajax auto
@@ -50,7 +57,7 @@
     </iron-ajax>
     <iron-list items="[[sponsors]]" grid scroll-target="document">
       <template>
-        <hack-sponsor-card data="[[item]]" on-expand-sponsor="expandSponsor">
+        <hack-sponsor-card data="[[item]]" longform>
         </hack-sponsor-card>
       </template>
     </iron-list>
@@ -59,13 +66,6 @@
   <script>
     Polymer({
       is: 'hack-sponsors',
-      properties: {
-
-      },
-      expandSponsor: function(e) {
-        this.querySelectorAll('hack-sponsor-card').forEach((card) => { card.detailsOpened = false; });
-        e.target.detailsOpened = true;
-      },
       attached: function() {
         setTimeout(function() { this.$$('iron-list').fire('iron-resize')}.bind(this), 2000)
       }

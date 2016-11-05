@@ -19,6 +19,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-icons/social-icons.html">
@@ -69,6 +70,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: black;
 
         font-weight: bold;
+      }
+      .signin-button {
+        height:48px;
+        font-size:14px;
+        font-weight:500;
+        /*@apply(--layout-horizontal);*/
+        /*@apply(--layout-justified);*/
+        /*align-items:center;*/
       }
     </style>
 
@@ -127,6 +136,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </paper-tab>
                   </template>
               </paper-tabs>
+            </template>
+            <template is="dom-if" if="[[!app.user.uid]]">
+              <paper-button class="signin-button">Sign in</paper-button>
             </template>
             <template is="dom-if" if="[[app.user.uid]]">
               <img class="profile-img" />
