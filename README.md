@@ -18,4 +18,4 @@ Run:
 
 Place the output of build/unbundled and/or build/bundled where you see fit (i.e. /var/www, serve in-situ).
 
-Please note that several features **do not** function over http, so it is strongly recommended to configure your host to server over https. A simple surge.sh deployment behind a cloudflare redirect is particularly easy to set up.
+Please note that several features **do not** function over http, so it is strongly recommended to configure your host to server over https. A simple surge.sh deployment behind a cloudflare redirect is particularly easy to set up. 
