@@ -8,6 +8,7 @@ Current capabilities:
 * Sponsor cards
 * Offline and lie-fi tolerant
 
+
 ## Deployment
 Run:
 ```bash
