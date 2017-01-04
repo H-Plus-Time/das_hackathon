@@ -15,7 +15,7 @@ build:
     - script:
         name: install dependencies
         code: |
-          HOME=$YARN_CACHE yarn && yarn global add bower gulp-cli
+          HOME=$YARN_CACHE yarn && yarn global add bower gulp-cli surge
     - script:
         name: bower install
         code: |
@@ -28,10 +28,9 @@ deploy:
   steps:
     - install-packages:
         packages: git
-    - leipert/git-push:
-        branch: gh-pages
-        gh_oauth: $GITHUB_TOKEN
-        basedir: build/unbundled
+    - script:
+      name: surge deploy
+      code: surge build/unbundled dashackathon.surge.sh
     - script:
         name: lighthouse audit
         code: |
