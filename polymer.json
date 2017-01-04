@@ -5,6 +5,7 @@
     "src/hack-schedule.html",
     "src/hack-home.html",
     "src/hack-sponsors.html",
+    "src/hack-projects.html",
     "src/hack-view404.html"
   ],
   "sourceGlobs": [
