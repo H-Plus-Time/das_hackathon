@@ -29,8 +29,12 @@ deploy:
     - install-packages:
         packages: git
     - script:
+        name: install surge
+        code: |
+          npm install -g surge
+    - script:
       name: surge deploy
-      code: surge build/unbundled dashackathon.surge.sh
+      code: surge build/unbundled dashackathon.surge.sh --token $SURGE_TOKEN
     - script:
         name: lighthouse audit
         code: |
